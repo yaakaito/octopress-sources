@@ -1,0 +1,16 @@
+---
+layout: post
+title: "Octopressのsourceを共有してみる"
+date: 2012-07-16 17:28
+comments: true
+categories: 
+---
+
+AirとRetina、両方で書く場合があるのでsource以下を共有することにした。
+全部共有しても・・・という感じなのでsource以下を全部サブモジュールっぽく扱うようにした。
+多分これでうまくいってるはず！
+
+## airから書いてdeployした
+## こんどはRetinaから書きたしてdeployした
+
+イイネ！
