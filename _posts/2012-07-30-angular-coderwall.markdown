@@ -39,7 +39,6 @@ function coderwallController($scope, $http) {
 ```
 で、取得できました！やりましたね！
 
-{% img http://yaakaito.github.com/images/angular-coderwall.png %}
 
 全文はgistにあります。
 
