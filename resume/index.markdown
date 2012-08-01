@@ -7,7 +7,6 @@ sharing: true
 footer: true
 ---
 
-# Resume
 ## 株式会社Mobways (アルバイト) 2009/05 ~ 2010/02
 * Felicaを用いた勤怠管理システムの開発
  * Felica接続部分、Webフロント、デザインを担当
