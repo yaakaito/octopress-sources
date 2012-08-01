@@ -1,8 +1,0 @@
----
-layout: post
-title: "tanomu"
-date: 2012-07-16 17:08
-comments: true
-categories: 
----
-たのむよーーーー
