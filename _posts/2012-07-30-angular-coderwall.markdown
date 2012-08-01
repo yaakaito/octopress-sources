@@ -13,15 +13,13 @@ categories: ["JavaScript", "AngularJS"]
 ## バッチを表示させるHTMLを書く
 とりあえずリストにイメージを突っ込んでいく感じにすることにしました。
 ```html
-<% raw %>
 <div ng-controller="coderwallController">
   <ul>
     <li ng-repeat="badge in badges">
-      <img ng-src="{{badge.badge}}" alt="{{badge.description}}" title="{{badge.name}}" />
+      <img ng-src="{% raw %}{{badge.badge}}{% endraw %}" alt="{% raw %}{{badge.description}}{% endraw %}" title="{% raw %}{{badge.name}}{% endraw %}" />
     </li>
   </ul>
 </div>
-<% endraw %>
 ```
 こんな感じでデータをバインディングします。
 

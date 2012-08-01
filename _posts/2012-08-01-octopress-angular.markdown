@@ -61,8 +61,8 @@ AngularJSの対象になるところは、(ネストできなくて外側でお�
 <script>
   function githubCtlr($scope, $http) {
     $scope.repos = [];
-    $http.jsonp("https://api.github.com/users/{{ site.github_user }}/repos?page=1&per_page=20&sort=pushed&callback=JSON_CALLBACK").success(function(data,status,header,config){
-      var count = {% raw %}{{ site.github_repo_count }}{% endraw %} || 5;
+    $http.jsonp("https://api.github.com/users/{% raw %}{{ site.github_user }}{% endraw %}/repos?page=1&per_page=20&sort=pushed&callback=JSON_CALLBACK").success(function(data,status,header,config){
+      var count = {\{ site.github_repo_count }} || 5;
       for(var i = 0; i < count; i++) {
         $scope.repos.push(data.data[i]);
       }
