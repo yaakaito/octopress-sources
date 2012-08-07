@@ -143,6 +143,22 @@ this.todos.fetch();
         </section>
       </div>
 ```
+コントローラーはこんな感じで。
+```javascript
+function AppCtrl($scope) {
+  $scope.createAccount = function() {
+  
+  }
+
+  $scope.login = function() {
+
+  }
+
+  $scope.addItem = function() {
+    
+  }
+}
+```
 
 ## 結論
 案外うまくいった。
