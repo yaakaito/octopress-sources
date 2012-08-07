@@ -113,52 +113,100 @@ this.todos.fetch();
 ```
 適当な感じにビューを作ります。
 ```html
-      <div ng-controller="AppCtrl">
-        <section>
-          <h2>account</h2>
-          <div>
-            <input ng-model="naccount" type="text" />
-            <input ng-model="npass" type="password" />
-            <button ng-click="createAccount()">create</button>
-          </div>
-          <div>
-            <input ng-model="laccount" type="text" />
-            <input ng-model="lpass" type="password" />
-            <button ng-click="login()">login</button>
-          </div>
-        </section>
-        <section>
-          <h2>Test-Objects</h2>
-          <button ng-click="sync()">sync</button>
-          <div>
-            <input ng-model="item-name" type="text" />
-            <input ng-model="item-description" type="text" />
-            <button ng-click="addItem()">add</button>
-          </div>
-          <ul>
-            <li ng-repeat="item in items">
-              {% raw %}{{ item.name }} / {{ item.description }}{% raw %}
-            </li>
-          </ul>
-        </section>
-      </div>
+<div ng-controller="AppCtrl">
+  <section>
+    <h2>account</h2>
+    <div>
+      <input ng-model="naccount" type="text" />
+      <input ng-model="npass" type="password" />
+      <button ng-click="createAccount()">create</button>
+    </div>
+    <div>
+      <input ng-model="laccount" type="text" />
+      <input ng-model="lpass" type="password" />
+      <button ng-click="login()">login</button>
+    </div>
+  </section>
+  <section>
+    <h2>Objects</h2>
+    <button ng-click="sync()">sync</button>
+    <div>
+      <input ng-model="itemName" type="text" />
+      <input ng-model="itemDescription" type="text" />
+      <button ng-click="addItem()">add</button>
+    </div>
+    <ul>
+      <li ng-repeat="item in items">
+        {{ item.name }} / {{ item.description }}
+      </li>
+    </ul>
+  </section>
+</div>
 ```
-コントローラーはこんな感じで。
+コントローラーはとりあえずこんな感じで。
 ```javascript
 function AppCtrl($scope) {
   $scope.createAccount = function() {
   
-  }
+  };
 
   $scope.login = function() {
 
-  }
+  };
 
   $scope.addItem = function() {
     
-  }
+  };
 }
 ```
+
+準備が整ったので、まずはParseを初期化します。
+コントローラーが読み込まれたあとに、
+```javascript
+Parse.initialize("hoge", "hoge");
+```
+とします。そうしたらモデルとそのコレクションを定義します、こんな感じかな。
+```javascript
+var SyncAppObject = Parse.Object.extend("SyncAppObject", {
+  default: {
+    description: "description";
+  }
+});
+var SyncAppObjectList = Parse.Collection.extend({
+  model: SyncAppObject
+  , comparator : function(obj) {
+    return obj.get("name");
+  }
+});
+  
+```
+
+モデルの準備ができたので、addItemでオブジェクトを作ってみましょう。
+```javascript
+var list = new SyncAppObjectList();
+$scope.items = list.models;
+
+$scope.addItem = function() {
+  var item = new SyncAppObject({name : $scope.itemName, description : $scope.itemDescription});
+  list.add(item);    
+};
+```
+コレクションのインスタンスを作って、`$scope.items`へ`models`を関連づけます。
+あとは`addItem`で新しいオブジェクトを作って追加してあげるだけです。
+が、Backbone的にはプロパティへのアクセスは`get()`を使ってね、ということなので、テンプレートの方も少し修正します。
+```
+      <li ng-repeat="item in items">
+        {{ item.get("name") }} / {{ item.get("description") }}
+      </li>
+```
+これで、addを押すと、BackboneライクなオブジェクトをAngularで表示できているはずです。予想に反して問題なさそうですね。
+次にこのモデルをParseへ送りつけましょう。`save`を呼ぶだけでokです。
+```
+  item.save();
+```
+うまくいけばParseのアプリケーションのマネージメニューから、「Data Browse」をすると、ちゃんとデータが追加されているはずです。
+
+
 
 ## 結論
 案外うまくいった。
