@@ -32,6 +32,7 @@ SDKをダウンロードしたら、このキーを使ってね、というの�
 
 まあ今回はどんなものか試してみるだけのものなので失敗込みで、ともかく進めていきましょう。
 方針としてはbackboneライクのモデルだけ使ってその他はAngularJSに持ってもらうイメージでいきます。
+チュートリアルのコードを追っているのでチュートリアルからの転載です。
 チュートリアルはどうやら[TODOMVC](http://addyosmani.github.com/todomvc/)のbackbonejs版を拡張しているみたいです。
 [コードはGithub](https://github.com/ParsePlatform/Todo)にあるようです。テンプレートとかは放っておいてコアっぽいところを見ていきます。
 まずログインしてるかしてないか、みたいなところは`Parse.User.current()`で判定できるみたいです。
@@ -104,6 +105,7 @@ this.todos.fetch();
 
 ## Angularで書いてみよう
 使い方も分かってきたのでAngularで書いてみましょう。どきどきですね。＞＜
+### とりあえず簡単なビューをつくる
 コントローラーやイベントハンドリングとかの基本的な部分はすべてAngularで面倒をみるので、
 まずは普通にそれっぽいビューを作っていきます。ライブラリを読み込んで、
 ```javascript
@@ -160,6 +162,8 @@ function AppCtrl($scope) {
 }
 ```
 
+### Parseを使ってみる
+
 準備が整ったので、まずはParseを初期化します。
 コントローラーが読み込まれたあとに、
 ```javascript
@@ -188,28 +192,107 @@ $scope.items = list.models;
 
 $scope.addItem = function() {
   var item = new SyncAppObject({name : $scope.itemName, description : $scope.itemDescription});
-  list.add(item);    
+  list.add(item);
+  $scope.items = list.models;
 };
 ```
 コレクションのインスタンスを作って、`$scope.items`へ`models`を関連づけます。
 あとは`addItem`で新しいオブジェクトを作って追加してあげるだけです。
 が、Backbone的にはプロパティへのアクセスは`get()`を使ってね、ということなので、テンプレートの方も少し修正します。
-```
+```javascript
       <li ng-repeat="item in items">
         {{ item.get("name") }} / {{ item.get("description") }}
       </li>
 ```
 これで、addを押すと、BackboneライクなオブジェクトをAngularで表示できているはずです。予想に反して問題なさそうですね。
 次にこのモデルをParseへ送りつけましょう。`save`を呼ぶだけでokです。
-```
-  item.save();
+```javascript
+item.save();
 ```
 うまくいけばParseのアプリケーションのマネージメニューから、「Data Browse」をすると、ちゃんとデータが追加されているはずです。
 
+### ユーザー作成とログイン
+まずはユーザーを作りますしょう。`createAccount`でチュートリアルでもでてきたsignupするコードを書きます。
+```
+$scope.createAccount = function() {
+  Parse.User.signUp($scope.naccount, $scope.npass, { ACL: new Parse.ACL() }, {
+    success: function(user) {
+      alert("ユーザー登録に成功したよ。 o(*^▽^*)o");
+    }
+    , error: function(user, error) {
+      alert("ユーザー登録に失敗しちゃったよ。 (ﾉ_･｡)");
+    }
+  });
+};
+```
+フォームからアカウントを作ってみましょう。成功したメッセージが出たら、「Data Browse」から確認してみましょう。
+Userというテーブルが増えているはずです。やりましね！
+ユーザーを作ったらそれに関連するデータとして登録するようにしましょう。
+ユーザーに関連づけるには`user`と`ACL`を設定します。
+```javascript
+$scope.addItem = function() {
+  if(!Parse.User.current()) {
+    alert("ログインするかユーザーつくってね。ヾ(@~▽~@)ノ");
+    return ;
+  }
+  var item = new SyncAppObject({name : $scope.itemName
+                                , description : $scope.itemDescription
+                                , user : Parse.User.current()
+                                , ACL : new Parse.ACL(Parse.User.current())});
+  list.add(item);
+  item.save();   
+  $scope.items = list.models;
+};
+```
+これでデータを追加してみて、「Data Browse」から確認します。するとユーザーのobjectIdと関連づけられているはずです。
+カラムも自動で拡張されるみたいです。便利ですね。
+ところでここで作ったユーザーとか後でやるログインした状態とかはSDK側でローカルへキャッシュしてくれるみたいです。
+だいたいできてきました！(だんだん顔文字がうざくなってきましたね)次はログインを作りましょう。
+```
+$scope.login = function() {
+  Parse.User.logIn($scope.laccount, $scope.lpass, {
+    success: function(user) {
+      alert("ログインに成功したよ。 o(*^▽^*)o");
+    },
+    error: function(user, error) {
+      alert("ログインに失敗しちゃったよ。 (ﾉ_･｡)");
+    }
+  });
+};
+```
+こんな感じにして、作ったユーザーでログインできるか試してみましょう。
+ログインできたらユーザーを切り替えたりしてみて、「Data Browse」から確認してみましょう！どうですか？成功しましたか？やりましたね！
+ついでなのでユーザー名を表示するようにしておきましょう。
+```html
+ <p>Login User : {{ loginUser }}</p>
+```
+こんな感じにかいて、初期化時に、
+```javascript
+if(Parse.User.current()) {
+  $scope.loginUser = Parse.User.current().get("username");
+} else {
+  $scope.loginUser = "not login";
+}
+```
+とかして初期の表示を作ってあげて、さらにユーザー作成やログインにフックしてビューを更新してあげます。
+```javascript
+$scope.loginUser = Parse.User.current().get("username");
+$scope.$apply();
+```
+### 同期を実装する
 
 
-## 結論
-案外うまくいった。
+
+## デバッガの話
+AngularJSを結構書くうちにデバッガがほしくなってきたんですが、(AngularJSのテンプレートのデバッグがむずい)メーリングリストとかみてみたら、
+[Batarang](https://github.com/btford/angularjs-batarang)というChrome拡張があったので僕はこれを使っています。
+これ単体の記事もそのうち書くと思います。
+
+## まとめ
+案外うまくいった。けどやっぱりプレーンなObject返すSDKを自分で作る方がよいような気がする・・・。
+Parse自体は使った感じそんなに悪くなくて、データビュアーとかもちゃんとあるので、個人で運用するようなサービスなら全然いけそうだなーという感じでした。
+割とサーバーサイド用意するのがだるくて作る気が起きなかったものとか結構あるので、これを気にいろいろ作ってみるかもしれません。
+とにかくクライアントサイド書いてるのがすきーな人にはかなり便利なサービスでした、おすすめです。
 
 ## 教訓
 ずっとスティーブ・Objective-C・ジョブズしててJavaScript界隈についていけていないので遅れ取り戻さないとやばいですねー。
