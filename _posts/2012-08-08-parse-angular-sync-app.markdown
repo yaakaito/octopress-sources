@@ -113,6 +113,7 @@ this.todos.fetch();
     <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.0.14.min.js"></script>
     <script type="text/javascript" src="./javascripts/app.js"></script>
 ```
+{% raw %}
 適当な感じにビューを作ります。
 ```html
 <div ng-controller="AppCtrl">
@@ -139,7 +140,7 @@ this.todos.fetch();
     </div>
     <ul>
       <li ng-repeat="item in items">
-        {{ item.name }} / {{ item.description }}
+       {{ item.name }} / {{ item.description }}
       </li>
     </ul>
   </section>
@@ -300,6 +301,8 @@ $scope.syncItems = function() {
 AngularJSのビューの更新との相性が悪いのか、1回目のsyncだとビューに反映されないですねっていう。
 このへんはちゃんと調べてないので分かんないですが、あんまりよくないですねー。が、今回はParseがどんなもんか試すだけなのでまあおけおけ。
 とりあえずこんな感じで実装はおしまいです。
+```
+{% endraw %}
 
 ## コードとか
 コードはgithubにあります。
