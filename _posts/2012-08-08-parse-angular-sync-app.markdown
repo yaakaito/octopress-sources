@@ -288,7 +288,7 @@ $scope.$apply();
 コレクションに対して`fetch`することで取得できるはずだったので、マージとか考えなければ案外楽にいけそうです。
 今回はマージとかは何も考えてなくて、とにかくサーバーからデータを拾ってくるだけです。
 条件なんかをちょこちょこ書いてビューへ反映しましょう。
-```javascript]
+```javascript
 $scope.syncItems = function() {
   objectList.query = new Parse.Query(SyncAppObject);
   objectList.query.equalTo("user", Parse.User.current());
@@ -300,6 +300,17 @@ $scope.syncItems = function() {
 AngularJSのビューの更新との相性が悪いのか、1回目のsyncだとビューに反映されないですねっていう。
 このへんはちゃんと調べてないので分かんないですが、あんまりよくないですねー。が、今回はParseがどんなもんか試すだけなのでまあおけおけ。
 とりあえずこんな感じで実装はおしまいです。
+
+## コードとか
+コードはgithubにあります。
+
+[yaakaito/sync-app](https://github.com/yaakaito/sync-app)
+
+またサンプルをgh-pagesへデプロイしてあるので、どんな感じかなーと気になる人がいれば見てみるとなにかよいかもしれません。
+
+[yaakaito.github.com/sync-app/](http://yaakaito.github.com/sync-app/)
+
+関係ないですが、簡単なJavaScriptアプリケーションならgh-pagesへデプロイしてしまって使うの、割とありかなーという感じが最近しています。
 
 ## デバッガの話
 AngularJSを結構書くうちにデバッガがほしくなってきたんですが、(AngularJSのテンプレートのデバッグがむずい)メーリングリストとかみてみたら、
