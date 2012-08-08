@@ -131,7 +131,7 @@ this.todos.fetch();
   </section>
   <section>
     <h2>Objects</h2>
-    <button ng-click="sync()">sync</button>
+    <button ng-click="syncItems()">sync</button>
     <div>
       <input ng-model="itemName" type="text" />
       <input ng-model="itemDescription" type="text" />
@@ -159,6 +159,11 @@ function AppCtrl($scope) {
   $scope.addItem = function() {
     
   };
+
+  $scope.syncItems = function() {
+
+  }
+
 }
 ```
 
@@ -187,13 +192,13 @@ var SyncAppObjectList = Parse.Collection.extend({
 
 モデルの準備ができたので、addItemでオブジェクトを作ってみましょう。
 ```javascript
-var list = new SyncAppObjectList();
-$scope.items = list.models;
+var objectList = new SyncAppObjectList();
+$scope.items = objectList.models;
 
 $scope.addItem = function() {
   var item = new SyncAppObject({name : $scope.itemName, description : $scope.itemDescription});
-  list.add(item);
-  $scope.items = list.models;
+  objectList.add(item);
+  $scope.items = objectList.models;
 };
 ```
 コレクションのインスタンスを作って、`$scope.items`へ`models`を関連づけます。
@@ -239,9 +244,9 @@ $scope.addItem = function() {
                                 , description : $scope.itemDescription
                                 , user : Parse.User.current()
                                 , ACL : new Parse.ACL(Parse.User.current())});
-  list.add(item);
+  objectList.add(item);
   item.save();   
-  $scope.items = list.models;
+  $scope.items = objectList.models;
 };
 ```
 これでデータを追加してみて、「Data Browse」から確認します。するとユーザーのobjectIdと関連づけられているはずです。
@@ -280,8 +285,21 @@ $scope.loginUser = Parse.User.current().get("username");
 $scope.$apply();
 ```
 ### 同期を実装する
-
-
+コレクションに対して`fetch`することで取得できるはずだったので、マージとか考えなければ案外楽にいけそうです。
+今回はマージとかは何も考えてなくて、とにかくサーバーからデータを拾ってくるだけです。
+条件なんかをちょこちょこ書いてビューへ反映しましょう。
+```javascript]
+$scope.syncItems = function() {
+  objectList.query = new Parse.Query(SyncAppObject);
+  objectList.query.equalTo("user", Parse.User.current());
+  objectList.fetch();
+  $scope.items = objectList.models; 
+}
+```
+これでsyncを押せばサーバーからログインしているユーザーにあわせたデータを拾ってこれま・・・したが、
+AngularJSのビューの更新との相性が悪いのか、1回目のsyncだとビューに反映されないですねっていう。
+このへんはちゃんと調べてないので分かんないですが、あんまりよくないですねー。が、今回はParseがどんなもんか試すだけなのでまあおけおけ。
+とりあえずこんな感じで実装はおしまいです。
 
 ## デバッガの話
 AngularJSを結構書くうちにデバッガがほしくなってきたんですが、(AngularJSのテンプレートのデバッグがむずい)メーリングリストとかみてみたら、
@@ -289,7 +307,7 @@ AngularJSを結構書くうちにデバッガがほしくなってきたんで�
 これ単体の記事もそのうち書くと思います。
 
 ## まとめ
-案外うまくいった。けどやっぱりプレーンなObject返すSDKを自分で作る方がよいような気がする・・・。
+思いの他うまくいった。けどやっぱりプレーンなObject返すSDKを自分で作る方がよいような気がする・・・。
 Parse自体は使った感じそんなに悪くなくて、データビュアーとかもちゃんとあるので、個人で運用するようなサービスなら全然いけそうだなーという感じでした。
 割とサーバーサイド用意するのがだるくて作る気が起きなかったものとか結構あるので、これを気にいろいろ作ってみるかもしれません。
 とにかくクライアントサイド書いてるのがすきーな人にはかなり便利なサービスでした、おすすめです。
