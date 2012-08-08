@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "ParseとAngularJSでユーザー毎にデータ同期してみる"
-date: 2012-08-08 01:31
+date: 2012-08-09 02:29
 comments: true
 categories: ["Parse", "AngularJS", "JavaScript", "WebApp", "Backbone.js"]
 ---
