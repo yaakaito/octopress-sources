@@ -197,7 +197,8 @@ var objectList = new SyncAppObjectList();
 $scope.items = objectList.models;
 
 $scope.addItem = function() {
-  var item = new SyncAppObject({name : $scope.itemName, description : $scope.itemDescription});
+  var item = new SyncAppObject({ name : $scope.itemName
+                                 , description : $scope.itemDescription});
   objectList.add(item);
   $scope.items = objectList.models;
 };
@@ -221,7 +222,11 @@ item.save();
 まずはユーザーを作りますしょう。`createAccount`でチュートリアルでもでてきたsignupするコードを書きます。
 ```
 $scope.createAccount = function() {
-  Parse.User.signUp($scope.naccount, $scope.npass, { ACL: new Parse.ACL() }, {
+  Parse.User.signUp($scope.naccount
+                    , $scope.npass
+                    , { ACL: new Parse.ACL() }
+                    ,  
+  {
     success: function(user) {
       alert("ユーザー登録に成功したよ。 o(*^▽^*)o");
     }
