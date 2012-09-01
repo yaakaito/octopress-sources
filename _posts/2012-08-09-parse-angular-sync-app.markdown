@@ -287,8 +287,11 @@ if(Parse.User.current()) {
 ```
 とかして初期の表示を作ってあげて、さらにユーザー作成やログインにフックしてビューを更新してあげます。
 ```javascript
-$scope.loginUser = Parse.User.current().get("username");
-$scope.$apply();
+  success: function(user) {
+    $scope.loginUser = Parse.User.current().get("username");
+    $scope.$apply();
+    alert("ログインに成功したよ。 o(*^▽^*)o");
+  },
 ```
 ### 同期を実装する
 コレクションに対して`fetch`することで取得できるはずだったので、マージとか考えなければ案外楽にいけそうです。

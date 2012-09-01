@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "便利なライブラリHullToRefresh作った。"
+title: "便利なライブラリHullToRefresh作った"
 date: 2012-08-31 06:31
 comments: true
 categories: [Objective-C, iOS, Joke]
